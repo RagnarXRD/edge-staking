@@ -38,7 +38,7 @@ export const RadixProvider = ({ children }: { children: ReactNode }) => {
     }))
 
     setState(radixDappToolkit);
-    console.log("WalletApi part:", radixDappToolkit)
+    console.log("DAPP_DEFINITION_ADDRESS", DAPP_DEFINITION_ADDRESS)
 
     return () => {
       radixDappToolkit.destroy()

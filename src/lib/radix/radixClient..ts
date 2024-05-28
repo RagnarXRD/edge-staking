@@ -7,5 +7,5 @@ export const radixDappToolkit = RadixDappToolkit({
   logger: createLogger(2),
 });
 
-
+console.log("DAPP_DEFINITION_ADDRESS", DAPP_DEFINITION_ADDRESS)
 export const walletApi = radixDappToolkit.walletApi

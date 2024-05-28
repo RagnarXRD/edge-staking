@@ -1,8 +1,8 @@
-import { EDG_RESOURCE_ADDRESS, POOL_ADDRESS, STAKING_COMPONENT_ADDRESS } from '@/constants/address'
+import { EDG_RESOURCE_ADDRESS, SEDG_RESOURCE_ADDRESS, STAKING_COMPONENT_ADDRESS } from '@/constants/address'
 
 export const TransactionManifests = () => {
-  const addStake = (accountAddress: string, tokensToStake: number) => {
-    const transactionManifest = `
+    const addStake = (accountAddress: string, tokensToStake: number) => {
+        const transactionManifest = `
         CALL_METHOD
             Address("${accountAddress}")
             "withdraw"
@@ -24,20 +24,20 @@ export const TransactionManifests = () => {
             Expression("ENTIRE_WORKTOP")
         ;
     `
-    console.log(transactionManifest)
-    return transactionManifest
-  }
+        console.log(transactionManifest)
+        return transactionManifest
+    }
 
-  const removeStake = (accountAddress: string, tokensToUnstake: number) => {
-    const transactionManifest = `
+    const removeStake = (accountAddress: string, tokensToUnstake: number) => {
+        const transactionManifest = `
         CALL_METHOD
             Address("${accountAddress}")
             "withdraw"
-            Address("${POOL_ADDRESS}")
+            Address("${SEDG_RESOURCE_ADDRESS}")
             Decimal("${tokensToUnstake}")
         ;
         TAKE_ALL_FROM_WORKTOP
-            Address("${POOL_ADDRESS}")
+            Address("${SEDG_RESOURCE_ADDRESS}")
             Bucket("unstakeBucket")
         ;
         CALL_METHOD
@@ -51,9 +51,9 @@ export const TransactionManifests = () => {
             Expression("ENTIRE_WORKTOP")
         ;
     `
-    console.log(transactionManifest)
-    return transactionManifest
-  }
+        console.log(transactionManifest)
+        return transactionManifest
+    }
 
-  return { addStake, removeStake }
+    return { addStake, removeStake }
 }

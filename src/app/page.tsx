@@ -31,7 +31,7 @@ export default function Home() {
 
   const { addStake, removeStake } = useSendTransactionManifest()()
 
-  const { accountAddress, edgeBalance, sEdgeBalance } = useAppSelector(state => state.accountAddressReducer)
+  const { edgeBalance, sEdgeBalance } = useAppSelector(state => state.accountAddressReducer)
   const { sEdg_totalSupply } = useAppSelector(state => state.setSedgSupplyReducer)
 
   const { persona } = usePersona()
@@ -78,9 +78,7 @@ export default function Home() {
     <main className="h-screen w-full flex flex-col p-4 items-center">
       <div className="flex w-full h-20 items-center justify-center">
         <div className="flex w-full justify-between items-center h-full">
-
           <div className="flex items-center gap-2">
-
             <div className={`p-1 bg-red-200 rounded-full shadow-md ${styles.colorChange200}`}>
               <div className={`p-1 bg-red-300 rounded-full shadow-md ${styles.colorChange300}`}>
                 <div className="flex items-center">
@@ -92,7 +90,6 @@ export default function Home() {
             </div>
             <h1 className={`hidden md:block font-bold text ${styles.colorChange}`}>EDGE</h1>
           </div>
-
 
           <div className="flex items-center gap-2">
             <a href="https://x.com/EDGECLUB_XRD" target="_blank" className="hover:scale-105 duration-200 p-2 rounded-full bg-[#f87171]">

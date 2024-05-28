@@ -9,7 +9,6 @@ import { setSedgSupply } from "@/lib/redux/features/sedg-slice";
 export const fetchBalances = async (walletAddress: string): Promise<any> => {
   let EDGbalance = "0";
   let sEDGbalance = "0";
-  let isOwner = false;
   if (walletAddress) {
     try {
       const response = await axios.post(
@@ -26,8 +25,6 @@ export const fetchBalances = async (walletAddress: string): Promise<any> => {
         );
         EDGbalance = balances.edg;
         sEDGbalance = balances.sedg;
-        isOwner = balances.isOwner;
-
         store.dispatch(setAccountAddress({ accountAddress: walletAddress, edgeBalance: EDGbalance, sEdgeBalance: sEDGbalance }));
       }
 
@@ -69,7 +66,6 @@ export const fetchPoolDetails = async () => {
     if (response.status === 200) {
       const balances = extractBalances(response.data.items[0].fungible_resources.items);
       stakedEDG = balances.edg;
-      console.log(stakedEDG)
     }
   } catch (error) {
     console.log("error in fetchPoolDetails", error);

@@ -8,18 +8,15 @@ import { SiGitbook } from "react-icons/si";
 import styles from './colorchange.module.css'
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePersona } from "@/hooks/usePersona";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useSendTransactionManifest } from "@/hooks/useSendTransactionManifest";
 import { fetchBalances, fetchPoolDetails } from "@/utils/fetchers";
 import { useConnectButtonState } from "@/hooks/useConnectButtonState";
 import { useAppSelector } from "@/lib/redux/hooks/hooks";
 import { formatBalance } from "@/utils/formatBalance";
-import ButtonComponent from "@/components/Button";
 import Stake from "@/components/Stake";
 import Unstake from "@/components/Unstake";
 
-const yearlyEdgReward = 24024406666.65
+// const yearlyEdgReward = 24024406666.65
 const weeklyEdgReward = 2002033888.8875
 
 export default function Home() {
@@ -29,10 +26,12 @@ export default function Home() {
 
   const { addStake, removeStake } = useSendTransactionManifest()()
 
-  const { edgeBalance, sEdgeBalance } = useAppSelector(state => state.accountAddressReducer)
+  const { accountAddress, edgeBalance, sEdgeBalance } = useAppSelector(state => state.accountAddressReducer)
   const { sEdg_totalSupply } = useAppSelector(state => state.setSedgSupplyReducer)
 
   const { persona } = usePersona()
+
+  const connectButton = useConnectButtonState()
 
 
   const fetchDetails = useCallback(() => {
@@ -48,11 +47,8 @@ export default function Home() {
 
   const stake = async () => {
     try {
-      addStake('account_tdx_2_12xv8cvdrwm4q0vk3qhrm2npcv4hhxquy7xkr28yx2zjsyn8039axz8', Number(amount)).then(
-        () => {
-          setLoading(false)
-        }
-      )
+      addStake(accountAddress, Number(amount))
+
     } catch (error) {
       console.log(error)
     }
@@ -60,15 +56,22 @@ export default function Home() {
 
   const unstake = async () => {
     try {
-      removeStake('account_tdx_2_12xv8cvdrwm4q0vk3qhrm2npcv4hhxquy7xkr28yx2zjsyn8039axz8', Number(amount)).then(
-        () => {
-          setLoading(false)
-        }
-      )
+      removeStake(accountAddress, Number(amount))
     } catch (error) {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    const fetchBalancesAsync = async () => {
+      if (connectButton === "success") {
+        await fetchBalances(accountAddress);
+      }
+    };
+
+    fetchBalancesAsync();
+  }, [connectButton, accountAddress]);
+
 
   const apy = useMemo(() => ((weeklyEdgReward / +sEdg_totalSupply) * 100).toFixed(2), [sEdg_totalSupply]);
 

@@ -20,8 +20,8 @@ export const RadixProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const radixDappToolkit = RadixDappToolkit({
-      networkId: RADIX_NETWORKID,
-      dAppDefinitionAddress: DAPP_DEFINITION_ADDRESS,
+      networkId: 1,
+      dAppDefinitionAddress: "account_rdx129ak5rtrlrknmnjq58tj9nurnzq5rs5dt5244t3t7k04det7lwc7pq",
       logger: createLogger(2),
     });
 

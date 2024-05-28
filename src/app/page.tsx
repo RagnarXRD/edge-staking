@@ -49,8 +49,6 @@ export default function Home() {
   }, [fetchDetails]);
 
   const stake = async () => {
-    setLoading(true)
-
     try {
       addStake('account_tdx_2_12xv8cvdrwm4q0vk3qhrm2npcv4hhxquy7xkr28yx2zjsyn8039axz8', Number(amount)).then(
         () => {
@@ -63,8 +61,6 @@ export default function Home() {
   }
 
   const unstake = async () => {
-    setLoading(true)
-
     try {
       removeStake('account_tdx_2_12xv8cvdrwm4q0vk3qhrm2npcv4hhxquy7xkr28yx2zjsyn8039axz8', Number(amount)).then(
         () => {
@@ -130,8 +126,30 @@ export default function Home() {
         </div> */}
         {/* </div> */}
 
-        {buttonType === "stake" ? <Stake buttonType={buttonType} setButtonType={setButtonType} amount={amount} setAmount={setAmount} edgeBalance={edgeBalance || ""} persona={Boolean(persona)} stake={stake} />
-          : <Unstake buttonType={buttonType} setButtonType={setButtonType} amount={amount} setAmount={setAmount} sEdgeBalance={sEdgeBalance || ""} persona={Boolean(persona)} unstake={unstake} />}
+        {buttonType === "stake"
+          ?
+          (
+            <Stake buttonType={buttonType}
+              setButtonType={setButtonType}
+              amount={amount}
+              setAmount={setAmount}
+              edgeBalance={edgeBalance || ""}
+              persona={Boolean(persona)}
+              stake={stake}
+            />
+          )
+          :
+          (
+            <Unstake buttonType={buttonType}
+              setButtonType={setButtonType}
+              amount={amount}
+              setAmount={setAmount}
+              sEdgeBalance={sEdgeBalance || ""}
+              persona={Boolean(persona)}
+              unstake={unstake}
+            />
+          )
+        }
 
       </div>
     </main>

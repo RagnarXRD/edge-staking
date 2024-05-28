@@ -17,6 +17,7 @@ import Stake from "@/components/Stake";
 import Unstake from "@/components/Unstake";
 
 // const yearlyEdgReward = 24024406666.65
+// Ghost commit
 const weeklyEdgReward = 2002033888.8875
 
 export default function Home() {

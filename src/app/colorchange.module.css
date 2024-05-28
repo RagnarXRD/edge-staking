@@ -1,0 +1,45 @@
+@keyframes color-change-200 {
+  0%, 100% { background-color: #fed7d7; } /* bg-red-200 */
+  33% { background-color: #fbb6ce; }    /* bg-red-300 */
+  66% { background-color: #fc8181; }    /* bg-red-400 */
+}
+
+@keyframes color-change-300 {
+  0%, 100% { background-color: #fbb6ce; } /* bg-red-300 */
+  33% { background-color: #fc8181; }    /* bg-red-400 */
+  66% { background-color: #fed7d7; }    /* bg-red-200 */
+}
+
+@keyframes color-change-400 {
+  0%, 100% { background-color: #fc8181; } /* bg-red-400 */
+  33% { background-color: #fed7d7; }    /* bg-red-200 */
+  66% { background-color: #fbb6ce; }    /* bg-red-300 */
+}
+
+.colorChange200 {
+  animation: color-change-200 2s infinite ease-in-out;
+}
+
+.colorChange300 {
+  animation: color-change-300 2s infinite ease-in-out;
+}
+
+.colorChange400 {
+  animation: color-change-400 2s infinite ease-in-out;
+}
+
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  margin-left: 8px;
+  border: 2px solid transparent;
+  border-top-color: #fe9ea4;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}

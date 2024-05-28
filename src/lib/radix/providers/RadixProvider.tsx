@@ -8,7 +8,7 @@ import {
   createLogger,
 } from "@radixdlt/radix-dapp-toolkit";
 import { RadixContext } from "./radixContext";
-import { RADIX_NETWORKID } from "@/constants/address";
+import { DAPP_DEFINITION_ADDRESS, RADIX_NETWORKID } from "@/constants/address";
 import { store } from "@/lib/redux/store";
 import { setAccountAddress } from "@/lib/redux/features/account-slice";
 import { fetchBalances } from "@/utils/fetchers";
@@ -21,7 +21,7 @@ export const RadixProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const radixDappToolkit = RadixDappToolkit({
       networkId: RADIX_NETWORKID,
-      dAppDefinitionAddress: 'account_rdx12xns9r80v85m7gejg8ej9rmpa6e3zj0ycjm4aducwpzr6dmzvt6lkq',
+      dAppDefinitionAddress: DAPP_DEFINITION_ADDRESS,
       logger: createLogger(2),
     });
 

@@ -19,8 +19,6 @@ import ButtonComponent from "@/components/Button";
 import Stake from "@/components/Stake";
 import Unstake from "@/components/Unstake";
 
-
-
 const yearlyEdgReward = 24024406666.65
 const weeklyEdgReward = 2002033888.8875
 
@@ -107,8 +105,6 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col gap-2 mt-4 md:w-[40rem]">
-
-        {/* <div className="grid grid-cols-2 w-full gap-2"> */}
         <div className="flex flex-col p-4 hover:scale-[1.02] duration-200 items-start bg-white rounded-md text-black text-sm font-medium">
           <h1>Staking APY%</h1>
           <h2 className="text-xl font-semibold">{apy + "%"}</h2>
@@ -147,7 +143,6 @@ export default function Home() {
             />
           )
         }
-
       </div>
     </main>
   );

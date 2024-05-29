@@ -16,7 +16,7 @@ import { formatBalance } from "@/utils/formatBalance";
 import Stake from "@/components/Stake";
 import Unstake from "@/components/Unstake";
 
-// const yearlyEdgReward = 24024406666.65
+const yearlyEdgReward = 24024406666.65
 // Ghost commit
 const weeklyEdgReward = 2002033888.8875
 
@@ -74,7 +74,7 @@ export default function Home() {
   }, [connectButton, accountAddress]);
 
 
-  const apy = useMemo(() => ((weeklyEdgReward / +sEdg_totalSupply) * 100).toFixed(2), [sEdg_totalSupply]);
+  const apy = useMemo(() => ((yearlyEdgReward / +sEdg_totalSupply) * 100).toFixed(2), [sEdg_totalSupply]);
 
   return (
     <main className="h-screen w-full flex flex-col p-4 items-center">

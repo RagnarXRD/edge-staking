@@ -20,6 +20,12 @@ function Stake({ buttonType, setButtonType, amount, setAmount, edgeBalance, pers
 
   const connectButton = useConnectButtonState()
 
+  const setPercentage = (percentage: number) => {
+    const total = Number(edgeBalance)
+    const newAmount = (total * percentage) / 100
+    setAmount(newAmount.toString())
+  }
+
   return (
     <div className="flex bg-red-300 flex-col font-bold p-4 justify-between gap-4 rounded-md">
       <div className="flex w-full bg-white rounded-md p-1 justify-between">
@@ -47,6 +53,23 @@ function Stake({ buttonType, setButtonType, amount, setAmount, edgeBalance, pers
             <p>${formatBalance(Number(edgeBalance))}</p>
           </div>
         </div>
+      </div>
+      <div className="flex w-full items-center justify-center gap-4">
+        <button onClick={() => setPercentage(10)} className="px-4 py-2 bg-white text-red-400 rounded-md hover:scale-105 duration-200">
+          10%
+        </button>
+        <button onClick={() => setPercentage(25)} className="px-4 py-2 bg-white text-red-400 rounded-md hover:scale-105 duration-200">
+          25%
+        </button>
+        <button onClick={() => setPercentage(50)} className="px-4 py-2 bg-white text-red-400 rounded-md hover:scale-105 duration-200">
+          50%
+        </button>
+        <button onClick={() => setPercentage(75)} className="px-4 py-2 bg-white text-red-400 rounded-md hover:scale-105 duration-200">
+          75%
+        </button>
+        <button onClick={() => setPercentage(100)} className="px-4 py-2 bg-white text-red-400 rounded-md hover:scale-105 duration-200">
+          Max
+        </button>
       </div>
       {/* <button disabled={!persona} onClick={stake} className="rounded-md bg-white text-[#fe9ea4] py-4 disabled:bg-gray-300 disabled:cursor-not-allowed">
             {persona ? "STAKE" : "Connect your wallet"}

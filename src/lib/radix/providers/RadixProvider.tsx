@@ -9,8 +9,6 @@ import {
 } from "@radixdlt/radix-dapp-toolkit";
 import { RadixContext } from "./radixContext";
 import { DAPP_DEFINITION_ADDRESS, RADIX_NETWORKID } from "@/constants/address";
-import { store } from "@/lib/redux/store";
-import { setAccountAddress } from "@/lib/redux/features/account-slice";
 import { fetchBalances } from "@/utils/fetchers";
 
 export const RadixProvider = ({ children }: { children: ReactNode }) => {
@@ -20,8 +18,8 @@ export const RadixProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const radixDappToolkit = RadixDappToolkit({
-      networkId: 1,
-      dAppDefinitionAddress: "account_rdx129ak5rtrlrknmnjq58tj9nurnzq5rs5dt5244t3t7k04det7lwc7pq",
+      networkId: RADIX_NETWORKID,
+      dAppDefinitionAddress: DAPP_DEFINITION_ADDRESS,
       logger: createLogger(2),
     });
 
@@ -38,7 +36,6 @@ export const RadixProvider = ({ children }: { children: ReactNode }) => {
     }))
 
     setState(radixDappToolkit);
-    console.log("DAPP_DEFINITION_ADDRESS", DAPP_DEFINITION_ADDRESS)
 
     return () => {
       radixDappToolkit.destroy()

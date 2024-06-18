@@ -1,7 +1,8 @@
 import { EDG_RESOURCE_ADDRESS, SEDG_RESOURCE_ADDRESS, STAKING_COMPONENT_ADDRESS } from '@/constants/address'
+import BigNumber from 'bignumber.js'
 
 export const TransactionManifests = () => {
-    const addStake = (accountAddress: string, tokensToStake: number) => {
+    const addStake = (accountAddress: string, tokensToStake: BigNumber) => {
         const transactionManifest = `
         CALL_METHOD
             Address("${accountAddress}")
@@ -28,7 +29,7 @@ export const TransactionManifests = () => {
         return transactionManifest
     }
 
-    const removeStake = (accountAddress: string, tokensToUnstake: number) => {
+    const removeStake = (accountAddress: string, tokensToUnstake: BigNumber) => {
         const transactionManifest = `
         CALL_METHOD
             Address("${accountAddress}")

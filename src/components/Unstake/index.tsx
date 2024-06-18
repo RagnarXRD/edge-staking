@@ -3,6 +3,11 @@ import React from 'react'
 import ButtonComponent from '../Button'
 import Image from 'next/image'
 import { useConnectButtonState } from '@/hooks/useConnectButtonState'
+import { useAppSelector } from '@/lib/redux/hooks/hooks'
+import BigNumber from 'bignumber.js'
+import { AMOUNT_INPUT_REGEX } from '@/constants/address'
+import { BN, formatTokenAmount, validateDecimalPlaces } from '@/utils/format'
+import { getSelectedBalance } from '@/utils/fetchers'
 
 interface StakeProps {
   buttonType: string
@@ -21,9 +26,24 @@ function Unstake({ buttonType, setButtonType, amount, setAmount, sEdgeBalance, p
   const connectButton = useConnectButtonState()
 
   const setPercentage = (percentage: number) => {
-    const total = Number(sEdgeBalance)
-    const newAmount = (total * percentage) / 100
-    setAmount(newAmount.toString())
+    const total = BN(sEdgeBalance)
+    const newAmount = total.times(percentage).div(100)
+    setAmount(newAmount.toFixed())
+  }
+
+  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value.replaceAll(",", "");
+    if (text.match(AMOUNT_INPUT_REGEX)) {
+      if (validateDecimalPlaces(text, 18)) {
+        setAmount(text);
+      }
+    } else {
+      resetInput();
+    }
+  };
+
+  const resetInput = () => {
+    setAmount("");
   }
 
   return (
@@ -36,10 +56,15 @@ function Unstake({ buttonType, setButtonType, amount, setAmount, sEdgeBalance, p
       <div className="flex flex-col bg-red-400 rounded-xl text-sm p-4 gap-6 font-semibold md:gap-10">
         <div className="flex flex-col w-full ">
           <div className="flex w-full items-center justify-between">
-            <input type="number" placeholder="0" onChange={(e) => setAmount((e.target.value))} value={amount} className="rounded-mdt bg-transparent h-[100%] w-[80%] text-2xl outline-none" />
+            <input
+              type="number"
+              placeholder="0"
+              onChange={(e) => onValueChange((e))}
+              value={amount}
+              className="rounded-mdt bg-transparent h-[100%] w-[80%] text-2xl outline-none" />
             <Image src='/sEdge.jpeg' width={60} height={60} alt='EDGE EDGE' className="rounded-full bg-cover h-10 w-10" />
           </div>
-          <p className="text-sm">~${formatBalance(Number(amount))} EDG</p>
+          <p className="text-sm">~${formatTokenAmount(parseFloat(amount))} EDG</p>
         </div>
         <div className="flex w-full justify-between text-sm">
           <div className="flex items-center gap-2">
@@ -50,7 +75,7 @@ function Unstake({ buttonType, setButtonType, amount, setAmount, sEdgeBalance, p
             </div>
           </div>
           <div>
-            <p>${formatBalance(Number(sEdgeBalance))}</p>
+            <p>${formatTokenAmount(parseFloat(sEdgeBalance))}</p>
           </div>
         </div>
       </div>
@@ -71,12 +96,11 @@ function Unstake({ buttonType, setButtonType, amount, setAmount, sEdgeBalance, p
           Max
         </button>
       </div>
-      {/* <button disabled={!persona} onClick={stake} className="rounded-md bg-white text-[#fe9ea4] py-4 disabled:bg-gray-300 disabled:cursor-not-allowed">
-            {persona ? "STAKE" : "Connect your wallet"}
-          </button> */}
       <ButtonComponent persona={persona} action={unstake} theme={connectButton} value={+amount} type='unstake' />
     </div>
   )
+
 }
 
 export default Unstake
+

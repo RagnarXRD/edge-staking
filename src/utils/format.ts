@@ -1,5 +1,30 @@
 import { CONTRACT_OWNER_BADGE_ADDRESS, EDG_RESOURCE_ADDRESS, SEDG_RESOURCE_ADDRESS } from "@/constants/address";
+import BigNumber from "bignumber.js";
+import numbro from "numbro";
 
+export const BN = BigNumber.clone({
+  DECIMAL_PLACES: 18,
+  ROUNDING_MODE: BigNumber.ROUND_HALF_UP,
+  EXPONENTIAL_AT: [-20, 20],
+});
+
+export const toLocaleFormat = (value: string) => {
+  if (value === "") {
+    return value;
+  }
+  value = value.replace(/[^0-9.]/g, "");
+  const containsDot = value.includes(".");
+
+  const parts = value.split(".");
+  const integerPart = parts[0];
+  const decimalPart = parts.length > 1 ? parts[1] : "";
+
+  const formattedIntegerPart = parseInt(integerPart).toLocaleString();
+
+  const answer =
+    decimalPart || containsDot ? formattedIntegerPart + "." + decimalPart : formattedIntegerPart;
+  return answer;
+};
 
 export const extractBalances = (
   resources: ResourceDetails[],
@@ -21,7 +46,6 @@ export const extractBalances = (
       isOwner = true;
     }
 
-    // Break the loop if both balances are found and check isOwner is true only if searchForOwner is true
     if (
       edgBalance !== undefined &&
       sedgBalance !== undefined &&
@@ -37,3 +61,33 @@ export const extractBalances = (
     isOwner,
   };
 };
+
+export const formatTokenAmount = (num: number | undefined, digits = 2) => {
+  if (num === 0) return "0";
+  if (!num) return "-";
+  if (num < 0.001 && digits <= 3) {
+    return "<0.001";
+  }
+  if (num < 0.01 && digits <= 2) {
+    return "<0.01";
+  }
+
+  let formattedAmount = numbro(num)
+    .formatCurrency({
+      average: true,
+      mantissa: num >= 1000 ? 2 : digits,
+      abbreviations: {
+        million: "M",
+        billion: "B",
+      },
+    })
+    .replace("$", "");
+
+  formattedAmount = formattedAmount.replace(".00", "");
+  return formattedAmount;
+};
+
+export function validateDecimalPlaces(numStr: string, maxDecimals: number) {
+  const regex = new RegExp(`^\\d+(\\.\\d{0,${maxDecimals}})?$`);
+  return regex.test(numStr);
+}

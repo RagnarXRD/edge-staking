@@ -15,15 +15,14 @@ import { useAppSelector } from "@/lib/redux/hooks/hooks";
 import { formatBalance } from "@/utils/formatBalance";
 import Stake from "@/components/Stake";
 import Unstake from "@/components/Unstake";
+import { useQuery } from "@tanstack/react-query";
+import { BN } from "@/utils/format";
 
 const yearlyEdgReward = 24024406666.65
-// Ghost commit
-const weeklyEdgReward = 2002033888.8875
 
 export default function Home() {
   const [buttonType, setButtonType] = useState('stake')
   const [amount, setAmount] = useState("0")
-  const [loading, setLoading] = useState(false)
 
   const { addStake, removeStake } = useSendTransactionManifest()()
 
@@ -34,21 +33,28 @@ export default function Home() {
 
   const connectButton = useConnectButtonState()
 
+  useQuery({
+    queryKey: ['details'],
+    queryFn: async () => {
+      await fetchPoolDetails();
+    }
+  });
 
-  const fetchDetails = useCallback(() => {
-    fetchPoolDetails();
-  }, []);
+  useQuery({
+    queryKey: ['balances'],
+    queryFn: async () => {
+      const response = await fetchBalances(accountAddress);
 
-  useEffect(() => {
-    fetchDetails();
-    const intervalId = setInterval(fetchDetails, 30000);
-
-    return () => clearInterval(intervalId);
-  }, [fetchDetails]);
+      return response
+    },
+    enabled: Boolean(connectButton === "success" && accountAddress)
+  });
 
   const stake = async () => {
+    const total = BN(amount)
+    console.log(total)
     try {
-      addStake(accountAddress, Number(amount))
+      addStake(accountAddress, total)
 
     } catch (error) {
       console.log(error)
@@ -56,22 +62,14 @@ export default function Home() {
   }
 
   const unstake = async () => {
+    const total = BN(amount)
+    console.log(total.toFixed())
     try {
-      removeStake(accountAddress, Number(amount))
+      removeStake(accountAddress, total)
     } catch (error) {
       console.log(error)
     }
   }
-
-  useEffect(() => {
-    const fetchBalancesAsync = async () => {
-      if (connectButton === "success") {
-        await fetchBalances(accountAddress);
-      }
-    };
-
-    fetchBalancesAsync();
-  }, [connectButton, accountAddress]);
 
 
   const apy = useMemo(() => ((yearlyEdgReward / +sEdg_totalSupply) * 100).toFixed(2), [sEdg_totalSupply]);
@@ -115,13 +113,8 @@ export default function Home() {
         </div>
         <div className="flex flex-col p-4 hover:scale-[1.02] duration-200 items-start bg-white rounded-md text-black text-sm font-medium">
           <h1>Total Staked</h1>
-          <h2 className="text-xl font-semibold">{formatBalance(Number(sEdg_totalSupply))} <span className="text-[#f87171] font-medium">$EDG</span></h2>
+          <h2 className="text-xl font-semibold">{formatBalance(parseFloat(sEdg_totalSupply))} <span className="text-[#f87171] font-medium">$EDG</span></h2>
         </div>
-        {/* <div className="flex flex-col p-4 hover:scale-[1.02] duration-200 items-start bg-white rounded-md text-black text-sm font-medium">
-          <h1><span className="text-[#f87171]">sEDG</span> Price</h1>
-          <h2 className="text-xl font-semibold">0.00 <span className="text-[#f87171] font-medium">$sEDG</span></h2>
-        </div> */}
-        {/* </div> */}
 
         {buttonType === "stake"
           ?

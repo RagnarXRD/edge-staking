@@ -32,3 +32,5 @@ export const CONTRACT_OWNER_BADGE_ADDRESS =
   process.env.NEXT_PUBLIC_AMBIENT === "prod"
     ? "resource_rdx1nghg26uyljfavq6rwkuyfcpsxdhuxvj08jrsc82fadlxsjuhwm36ju"
     : "resource_tdx_2_1ng9sr8puzm3l958qda8vtra683dsdf7637rfel4ehhmxwcpuh9yyze";
+
+export const AMOUNT_INPUT_REGEX = /^((\d+[.]?\d*)|(\.\d+))$/;

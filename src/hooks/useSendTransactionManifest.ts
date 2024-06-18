@@ -1,6 +1,7 @@
 import { TransactionManifests } from '@/lib/radix/transaction-manifests'
 import { useCallback } from 'react'
 import { useSendTransaction } from './useSendTransaction'
+import BigNumber from 'bignumber.js'
 
 export const useSendTransactionManifest = () => {
   const transactionManifests = TransactionManifests()
@@ -8,12 +9,12 @@ export const useSendTransactionManifest = () => {
 
   return useCallback(
     () => ({
-      addStake: (accountAddress: string, tokensToStake: number) =>
+      addStake: (accountAddress: string, tokensToStake: BigNumber) =>
         sendTransaction(
           transactionManifests.addStake(accountAddress, tokensToStake),
           'EDGing your $EDG I see'
         ),
-      removeStake: (accountAddress: string, tokensToUnstake: number) =>
+      removeStake: (accountAddress: string, tokensToUnstake: BigNumber) =>
         sendTransaction(
           transactionManifests.removeStake(accountAddress, tokensToUnstake),
           'Are you cuming or going?'

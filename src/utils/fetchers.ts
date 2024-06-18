@@ -1,7 +1,7 @@
 import { ociswap, radixNetwork } from "@/constants/endpoints";
 import { store } from "@/lib/redux/store";
 import axios, { AxiosResponse } from "axios";
-import { extractBalances } from "./format";
+import { BN, extractBalances } from "./format";
 import { POOL_ADDRESS } from "@/constants/address";
 import { setAccountAddress } from "@/lib/redux/features/account-slice";
 import { setSedgSupply } from "@/lib/redux/features/sedg-slice";
@@ -72,4 +72,12 @@ export const fetchPoolDetails = async () => {
   }
   store.dispatch(setSedgSupply({ sEdg_totalSupply: stakedEDG }));
   // store.dispatch(setPoolDataLoading(false));
+};
+
+export const getSelectedBalance = (tab: string) => {
+  const state = store.getState();
+  const {
+    accountAddressReducer: { edgeBalance, sEdgeBalance },
+  } = state;
+  return "stake" ? BN(edgeBalance || "") : BN(sEdgeBalance || "");
 };

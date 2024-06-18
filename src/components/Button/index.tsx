@@ -35,7 +35,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({ persona, action, theme, value,
     theme === 'error' ||
     value == null ||
     value <= 0 ||
-    value > Number(type === 'stake' ? edgeBalance : sEdgeBalance);
+    value > parseFloat(type === 'stake' ? edgeBalance : sEdgeBalance);
 
   return (
     <button

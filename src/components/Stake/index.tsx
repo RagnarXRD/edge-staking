@@ -3,6 +3,8 @@ import React from 'react'
 import ButtonComponent from '../Button'
 import Image from 'next/image'
 import { useConnectButtonState } from '@/hooks/useConnectButtonState'
+import { BN, formatTokenAmount, validateDecimalPlaces } from '@/utils/format'
+import { AMOUNT_INPUT_REGEX } from '@/constants/address'
 
 interface StakeProps {
   buttonType: string
@@ -21,9 +23,24 @@ function Stake({ buttonType, setButtonType, amount, setAmount, edgeBalance, pers
   const connectButton = useConnectButtonState()
 
   const setPercentage = (percentage: number) => {
-    const total = Number(edgeBalance)
-    const newAmount = (total * percentage) / 100
-    setAmount(newAmount.toString())
+    const total = BN(edgeBalance)
+    const newAmount = total.times(percentage).div(100)
+    setAmount(newAmount.toFixed())
+  }
+
+  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value.replaceAll(",", "");
+    if (text.match(AMOUNT_INPUT_REGEX)) {
+      if (validateDecimalPlaces(text, 18)) {
+        setAmount(text);
+      }
+    } else {
+      resetInput();
+    }
+  };
+
+  const resetInput = () => {
+    setAmount("");
   }
 
   return (
@@ -36,10 +53,16 @@ function Stake({ buttonType, setButtonType, amount, setAmount, edgeBalance, pers
       <div className="flex flex-col bg-red-400 rounded-xl text-sm p-4 gap-6 font-semibold md:gap-10">
         <div className="flex flex-col w-full ">
           <div className="flex w-full items-center justify-between">
-            <input type="number" placeholder="0" onChange={(e) => setAmount((e.target.value))} value={amount} className="rounded-mdt bg-transparent h-[100%] w-[80%] text-2xl outline-none" />
+            <input
+              type="number"
+              placeholder="0"
+              onChange={(e) => onValueChange((e))}
+              value={amount}
+              className="rounded-mdt bg-transparent h-[100%] w-[80%] text-2xl outline-none"
+            />
             <Image src='/bill.jpg' width={60} height={60} alt='EDGE EDGE' className="rounded-full bg-cover h-10 w-10" />
           </div>
-          <p className="text-sm">~${formatBalance(Number(amount))} sEDG</p>
+          <p className="text-sm">${formatTokenAmount(parseFloat(amount))} sEDG</p>
         </div>
         <div className="flex w-full justify-between text-sm">
           <div className="flex items-center gap-2">
@@ -50,7 +73,7 @@ function Stake({ buttonType, setButtonType, amount, setAmount, edgeBalance, pers
             </div>
           </div>
           <div>
-            <p>${formatBalance(Number(edgeBalance))}</p>
+            <p>${formatTokenAmount(parseFloat(edgeBalance))}</p>
           </div>
         </div>
       </div>
@@ -71,9 +94,6 @@ function Stake({ buttonType, setButtonType, amount, setAmount, edgeBalance, pers
           Max
         </button>
       </div>
-      {/* <button disabled={!persona} onClick={stake} className="rounded-md bg-white text-[#fe9ea4] py-4 disabled:bg-gray-300 disabled:cursor-not-allowed">
-            {persona ? "STAKE" : "Connect your wallet"}
-          </button> */}
       <ButtonComponent persona={persona} action={stake} theme={connectButton} value={+amount} type='stake' />
     </div>
   )

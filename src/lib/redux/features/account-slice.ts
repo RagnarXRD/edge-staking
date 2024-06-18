@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface InitialState {
   accountAddress: string,
-  edgeBalance?: string,
-  sEdgeBalance?: string,
+  edgeBalance: string,
+  sEdgeBalance: string,
 };
 const initialState: InitialState = {
   accountAddress: "",

@@ -48,7 +48,7 @@ export default function Home() {
 		queryKey: ["balances"],
 		queryFn: async () => {
 			const response = await fetchBalances(accountAddress);
-
+			console.log(response);
 			return response;
 		},
 		enabled: Boolean(connectButton === "success" && accountAddress),
@@ -115,6 +115,7 @@ export default function Home() {
 						<a
 							href="https://x.com/EDGECLUB_XRD"
 							target="_blank"
+							rel="noreferrer"
 							className="hover:scale-105 duration-200 p-2 rounded-full bg-[#f87171]"
 						>
 							<BsTwitterX />
@@ -122,6 +123,7 @@ export default function Home() {
 						<a
 							href="https://t.me/edgemasters"
 							target="_blank"
+							rel="noreferrer"
 							className="hover:scale-105 duration-200 p-2 rounded-full bg-[#f87171]"
 						>
 							<FaTelegramPlane />
@@ -129,6 +131,7 @@ export default function Home() {
 						<a
 							href="https://edge-club.gitbook.io/edge-club"
 							target="_blank"
+							rel="noreferrer"
 							className="hover:scale-105 duration-200 p-2 rounded-full bg-[#f87171]"
 						>
 							<SiGitbook />
@@ -141,12 +144,12 @@ export default function Home() {
 			<div className="flex flex-col gap-2 mt-4 md:w-[40rem]">
 				<div className="flex flex-col p-4 hover:scale-[1.02] duration-200 items-start bg-white rounded-md text-black text-sm font-medium">
 					<h1>Staking APY%</h1>
-					<h2 className="text-xl font-semibold">{apy + "%"}</h2>
+					<h2 className="text-xl font-semibold">{`${apy}%`}</h2>
 				</div>
 				<div className="flex flex-col p-4 hover:scale-[1.02] duration-200 items-start bg-white rounded-md text-black text-sm font-medium">
 					<h1>Total Staked</h1>
 					<h2 className="text-xl font-semibold">
-						{formatBalance(parseFloat(sEdg_totalSupply))}{" "}
+						{formatBalance(Number.parseFloat(sEdg_totalSupply))}{" "}
 						<span className="text-[#f87171] font-medium">$EDG</span>
 					</h2>
 				</div>

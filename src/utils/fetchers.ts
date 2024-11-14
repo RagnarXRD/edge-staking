@@ -1,15 +1,46 @@
-import { ociswap, radixNetwork } from "@/constants/endpoints";
+import { radixNetwork } from "@/constants/endpoints";
 import { store } from "@/lib/redux/store";
-import axios, { type AxiosResponse } from "axios";
-import { BN, extractBalances } from "./format";
-import { POOL_ADDRESS } from "@/constants/address";
+import axios from "axios";
+import { BN, extractBalances, extractBalancesNew } from "./format";
+import {
+	EDG_RESOURCE_ADDRESS,
+	POOL_ADDRESS,
+	SEDG_RESOURCE_ADDRESS,
+} from "@/constants/address";
 import { setAccountAddress } from "@/lib/redux/features/account-slice";
 import { setSedgSupply } from "@/lib/redux/features/sedg-slice";
+import type {
+	FungibleResourcesCollectionItem,
+	StateEntityFungiblesPageResponse,
+} from "@radixdlt/radix-dapp-toolkit";
+import { state } from "@/lib/radix/radixGateway";
 
 interface BalanceResponse {
 	edg: string;
 	sedg: string;
 }
+
+const fetchAllFungibles = async (walletAddress: string) => {
+	let allFungibleItems: FungibleResourcesCollectionItem[] = [];
+	let nextCursor = undefined;
+	let response: StateEntityFungiblesPageResponse;
+	let state_version: number | undefined = undefined;
+	do {
+		response = await state.innerClient.entityFungiblesPage({
+			stateEntityFungiblesPageRequest: {
+				address: walletAddress,
+				cursor: nextCursor,
+				aggregation_level: "Global",
+				at_ledger_state: state_version ? { state_version } : undefined,
+			},
+		});
+
+		allFungibleItems = allFungibleItems.concat(response.items);
+		nextCursor = response.next_cursor;
+		state_version = response.ledger_state.state_version;
+	} while (nextCursor);
+	return allFungibleItems;
+};
 
 export const fetchBalances = async (
 	walletAddress: string,
@@ -18,37 +49,22 @@ export const fetchBalances = async (
 		console.warn("Wallet address is required");
 		return;
 	}
-
-	let allFungibleResources: any[] = [];
-	let nextCursor: string | null = null;
+	const allFungibleItems = await fetchAllFungibles(walletAddress);
 
 	try {
-		do {
-			const response = await axios.post(
-				`${radixNetwork}/state/entity/details`,
-				{
-					addresses: [walletAddress],
-					cursor: nextCursor,
-				},
-			);
+		const { balances } = extractBalancesNew(
+			allFungibleItems,
+			[
+				{ symbol: "EDG", address: EDG_RESOURCE_ADDRESS },
+				{ symbol: "sEDG", address: SEDG_RESOURCE_ADDRESS },
+			],
+			true,
+		);
 
-			if (response.status === 200) {
-				const { items } = response.data.items[0].fungible_resources;
-				allFungibleResources = [...allFungibleResources, ...items];
-				nextCursor = response.data.items[0].fungible_resources.next_cursor;
-			} else {
-				console.error(
-					"Failed to fetch data:",
-					response.status,
-					response.statusText,
-				);
-				return;
-			}
-		} while (nextCursor);
+		console.log("balances:", balances);
 
-		const balances = extractBalances(allFungibleResources, true);
-		const EDGbalance = balances.edg || "0";
-		const sEDGbalance = balances.sedg || "0";
+		const EDGbalance = balances.EDG || "0";
+		const sEDGbalance = balances.sEDG || "0";
 
 		// Dispatch the balance to the store
 		store.dispatch(
@@ -64,22 +80,6 @@ export const fetchBalances = async (
 		console.error("Error in fetchBalances:", error);
 	}
 };
-
-// export const fetchEDGdata = async () => {
-//   try {
-//     // store.dispatch(setTokenDataLoading(true));
-//     const data = await axios.get(
-//       `${ociswap}/tokens/resource_rdx1t4v2jke9xkcrqra9sf3lzgpxwdr590npkt03vufty4pwuu205q03az`
-//     );
-//     if (data.status === 200) {
-//       // store.dispatch(setHitPrice(+data.data.price.usd.now));
-//       // store.dispatch(updateTokenData(data.data));
-//     }
-//   } catch (error) {
-//     console.log("error in fetchHITdata", error);
-//   }
-//   // store.dispatch(setTokenDataLoading(false));
-// };
 
 export const fetchPoolDetails = async () => {
 	let stakedEDG = "0";

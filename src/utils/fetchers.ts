@@ -1,39 +1,68 @@
 import { ociswap, radixNetwork } from "@/constants/endpoints";
 import { store } from "@/lib/redux/store";
-import axios, { AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from "axios";
 import { BN, extractBalances } from "./format";
 import { POOL_ADDRESS } from "@/constants/address";
 import { setAccountAddress } from "@/lib/redux/features/account-slice";
 import { setSedgSupply } from "@/lib/redux/features/sedg-slice";
 
-export const fetchBalances = async (walletAddress: string): Promise<any> => {
-  let EDGbalance = "0";
-  let sEDGbalance = "0";
-  if (walletAddress) {
-    try {
-      const response = await axios.post(
-        `${radixNetwork}/state/entity/details`,
-        {
-          addresses: [walletAddress],
-        }
-      );
+interface BalanceResponse {
+	edg: string;
+	sedg: string;
+}
 
-      if (response.status === 200) {
-        const balances = extractBalances(
-          response.data.items[0].fungible_resources.items,
-          true
-        );
-        EDGbalance = balances.edg;
-        sEDGbalance = balances.sedg;
-        store.dispatch(setAccountAddress({ accountAddress: walletAddress, edgeBalance: EDGbalance, sEdgeBalance: sEDGbalance }));
-      }
+export const fetchBalances = async (
+	walletAddress: string,
+): Promise<BalanceResponse | undefined> => {
+	if (!walletAddress) {
+		console.warn("Wallet address is required");
+		return;
+	}
 
-      return response as AxiosResponse;
-    } catch (error) {
-      console.log("error in fetchBalances", error);
-    }
-  }
-  // store.dispatch();
+	let allFungibleResources: any[] = [];
+	let nextCursor: string | null = null;
+
+	try {
+		do {
+			const response = await axios.post(
+				`${radixNetwork}/state/entity/details`,
+				{
+					addresses: [walletAddress],
+					cursor: nextCursor,
+				},
+			);
+
+			if (response.status === 200) {
+				const { items } = response.data.items[0].fungible_resources;
+				allFungibleResources = [...allFungibleResources, ...items];
+				nextCursor = response.data.items[0].fungible_resources.next_cursor;
+			} else {
+				console.error(
+					"Failed to fetch data:",
+					response.status,
+					response.statusText,
+				);
+				return;
+			}
+		} while (nextCursor);
+
+		const balances = extractBalances(allFungibleResources, true);
+		const EDGbalance = balances.edg || "0";
+		const sEDGbalance = balances.sedg || "0";
+
+		// Dispatch the balance to the store
+		store.dispatch(
+			setAccountAddress({
+				accountAddress: walletAddress,
+				edgeBalance: EDGbalance,
+				sEdgeBalance: sEDGbalance,
+			}),
+		);
+
+		return { edg: EDGbalance, sedg: sEDGbalance };
+	} catch (error) {
+		console.error("Error in fetchBalances:", error);
+	}
 };
 
 // export const fetchEDGdata = async () => {
@@ -53,31 +82,30 @@ export const fetchBalances = async (walletAddress: string): Promise<any> => {
 // };
 
 export const fetchPoolDetails = async () => {
-  let stakedEDG = "0";
-  try {
-    // store.dispatch(setPoolDataLoading(true));
-    const response = await axios.post(
-      `${radixNetwork}/state/entity/details`,
-      {
-        addresses: [POOL_ADDRESS],
-      }
-    );
+	let stakedEDG = "0";
+	try {
+		// store.dispatch(setPoolDataLoading(true));
+		const response = await axios.post(`${radixNetwork}/state/entity/details`, {
+			addresses: [POOL_ADDRESS],
+		});
 
-    if (response.status === 200) {
-      const balances = extractBalances(response.data.items[0].fungible_resources.items);
-      stakedEDG = balances.edg;
-    }
-  } catch (error) {
-    console.log("error in fetchPoolDetails", error);
-  }
-  store.dispatch(setSedgSupply({ sEdg_totalSupply: stakedEDG }));
-  // store.dispatch(setPoolDataLoading(false));
+		if (response.status === 200) {
+			const balances = extractBalances(
+				response.data.items[0].fungible_resources.items,
+			);
+			stakedEDG = balances.edg;
+		}
+	} catch (error) {
+		console.log("error in fetchPoolDetails", error);
+	}
+	store.dispatch(setSedgSupply({ sEdg_totalSupply: stakedEDG }));
+	// store.dispatch(setPoolDataLoading(false));
 };
 
 export const getSelectedBalance = (tab: string) => {
-  const state = store.getState();
-  const {
-    accountAddressReducer: { edgeBalance, sEdgeBalance },
-  } = state;
-  return "stake" ? BN(edgeBalance || "") : BN(sEdgeBalance || "");
+	const state = store.getState();
+	const {
+		accountAddressReducer: { edgeBalance, sEdgeBalance },
+	} = state;
+	return "stake" ? BN(edgeBalance || "") : BN(sEdgeBalance || "");
 };
